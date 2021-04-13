@@ -7,7 +7,7 @@ tags:
     - vpc
 versions:
 - platforms: []
-  dependencies: []
+  dependencies:
     - id: resource-group
       refs:
         - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group

@@ -36,8 +36,8 @@ variable "label" {
   default     = "default"
 }
 
-variable "gateway_ids" {
-  type        = list(string)
-  description = "List of gateway ids"
+variable "gateways" {
+  type        = list(object({id = string, zone = string}))
+  description = "List of gateway ids and zones"
   default     = []
 }
