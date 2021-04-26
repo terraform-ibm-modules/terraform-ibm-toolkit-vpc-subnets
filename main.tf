@@ -6,6 +6,7 @@ locals {
   ipv4_cidr_provided = length(var.ipv4_cidr_blocks) >= var._count
   ipv4_cidr_block    = local.ipv4_cidr_provided ? var.ipv4_cidr_blocks : [ for index in range(var._count): "" ]
   ipv4_address_count = local.ipv4_cidr_provided ? "" : var.ipv4_address_count
+  subnets            = local.ipv4_cidr_provided ? ibm_is_subnet.vpc_subnet_cidr_block : ibm_is_subnet.vpc_subnet_total_count
 }
 
 resource null_resource print_names {
