@@ -53,3 +53,9 @@ variable "ipv4_address_count" {
   description = "The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored."
   default     = 256
 }
+
+variable "provision" {
+  type        = bool
+  description = "Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up."
+  default     = true
+}
