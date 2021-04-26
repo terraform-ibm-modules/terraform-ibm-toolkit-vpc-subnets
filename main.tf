@@ -22,6 +22,15 @@ data ibm_is_vpc vpc {
   name  = var.vpc_name
 }
 
+resource null_resource print-values {
+  provisioner "local-exec" {
+    command = "echo 'IPv4 address count: ${local.ipv4_address_count}'"
+  }
+  provisioner "local-exec" {
+    command = "echo 'IPv4 cidr blocks: ${jsonencode(local.ipv4_cidr_block)}'"
+  }
+}
+
 resource ibm_is_subnet vpc_subnet {
   count                    = var._count
 
