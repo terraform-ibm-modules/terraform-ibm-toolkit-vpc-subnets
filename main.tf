@@ -29,18 +29,6 @@ data ibm_is_vpc vpc {
   name  = var.vpc_name
 }
 
-resource ibm_is_subnet vpc_subnet_cidr_block {
-  count                    = local.ipv4_cidr_provided ? var._count : 0
-
-  name                     = "${var.vpc_name}-subnet-${var.label}${format("%02s", count.index)}"
-  zone                     = local.vpc_zone_names[count.index]
-  vpc                      = data.ibm_is_vpc.vpc.id
-  public_gateway           = coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
-  resource_group           = var.resource_group_id
-  network_acl              = var.acl_id
-  ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
-}
-
 resource ibm_is_subnet vpc_subnet_total_count {
   count                    = local.ipv4_cidr_provided ? 0 : var._count
 
@@ -51,4 +39,26 @@ resource ibm_is_subnet vpc_subnet_total_count {
   total_ipv4_address_count = var.ipv4_address_count
   resource_group           = var.resource_group_id
   network_acl              = var.acl_id
+}
+
+resource ibm_is_vpc_address_prefix cidr_prefix {
+  count = local.ipv4_cidr_provided ? var._count : 0
+
+  name  = "${var.vpc_name}-cidr-${var.label}${format("%02s", count.index)}"
+  zone  = local.vpc_zone_names[count.index]
+  vpc   = data.ibm_is_vpc.vpc.id
+  cidr  = local.ipv4_cidr_block[count.index]
+}
+
+resource ibm_is_subnet vpc_subnet_cidr_block {
+  count                    = local.ipv4_cidr_provided ? var._count : 0
+  depends_on               = [ibm_is_vpc_address_prefix.cidr_prefix]
+
+  name                     = "${var.vpc_name}-subnet-${var.label}${format("%02s", count.index)}"
+  zone                     = local.vpc_zone_names[count.index]
+  vpc                      = data.ibm_is_vpc.vpc.id
+  public_gateway           = coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
+  resource_group           = var.resource_group_id
+  network_acl              = var.acl_id
+  ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
 }
