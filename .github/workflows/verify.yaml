@@ -19,6 +19,7 @@ jobs:
       matrix:
         platform:
           - vpc_count
+          - vpc_count_cidr
       fail-fast: false
 
     env:

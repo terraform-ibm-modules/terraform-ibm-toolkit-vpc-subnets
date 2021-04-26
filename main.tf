@@ -1,8 +1,10 @@
 
 locals {
-  zone_count        = 3
-  vpc_zone_names    = [ for index in range(var._count): "${var.region}-${(index % local.zone_count) + 1}" ]
-  gateway_count     = min(length(var.gateways), local.zone_count)
+  zone_count         = 3
+  vpc_zone_names     = [ for index in range(var._count): "${var.region}-${(index % local.zone_count) + 1}" ]
+  gateway_count      = min(length(var.gateways), local.zone_count)
+  ipv4_cidr_block    = length(var.ipv4_cidr_blocks) >= var._count ? var.ipv4_cidr_blocks : [ for index in range(var._count): "" ]
+  ipv4_address_count = length(var.ipv4_cidr_blocks) >= var._count ? "" : var.ipv4_address_count
 }
 
 resource null_resource print_names {
@@ -27,7 +29,8 @@ resource ibm_is_subnet vpc_subnet {
   zone                     = local.vpc_zone_names[count.index]
   vpc                      = data.ibm_is_vpc.vpc.id
   public_gateway           = coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
-  total_ipv4_address_count = 256
+  total_ipv4_address_count = local.ipv4_address_count
   resource_group           = var.resource_group_id
   network_acl              = var.acl_id
+  ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
 }

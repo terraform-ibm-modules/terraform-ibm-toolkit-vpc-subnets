@@ -43,3 +43,15 @@ variable "vpc_subnet_count" {
   description = "The number of subnets to create for the VPC instance"
   default     = 0
 }
+
+variable "ipv4_cidr_blocks" {
+  type        = string
+  description = "List of ipv4 cidr blocks for the subnets that will be created (e.g. [\"10.10.10.0/24\"]). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value."
+  default     = ""
+}
+
+variable "ipv4_address_count" {
+  type        = string
+  description = "The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored."
+  default     = "256"
+}
