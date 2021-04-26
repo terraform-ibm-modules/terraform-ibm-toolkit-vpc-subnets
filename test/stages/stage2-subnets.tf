@@ -9,6 +9,6 @@ module "subnets" {
   gateways           = module.gateways.gateways
   _count             = var.vpc_subnet_count
   label              = "cluster"
-  ipv4_cidr_blocks   = tolist(setsubtract(split(",", var.ipv4_cidr_blocks), ""))
+  ipv4_cidr_blocks   = tolist(setsubtract(split(",", var.ipv4_cidr_blocks), [""]))
   ipv4_address_count = var.ipv4_address_count
 }
