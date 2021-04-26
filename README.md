@@ -8,35 +8,34 @@ The module depends on the following software components:
 
 ### Command-line tools
 
-- terraform - v12
+- terraform - v13
 - kubectl
 
 ### Terraform providers
 
-- IBM Cloud provider >= 1.5.3
+- IBM Cloud provider >= 1.22.0
 - Helm provider >= 1.1.1 (provided by Terraform)
 
 ## Module dependencies
 
 This module makes use of the output from other modules:
 
-- Cluster - github.com/ibm-garage-cloud/terraform-ibm-container-platform.git
-- Namespace - github.com/ibm-garage-clout/terraform-cluster-namespace.git
-- etc
+- Resource Group - github.com/cloud-native-toolkit/terraform-ibm-container-platform.git
+- VPC - github.com/cloud-native-toolkit/terraform-ibm-vpc.git
+- Gateway - github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways.git
 
 ## Example usage
 
 ```hcl-terraform
-module "dev_tools_argocd" {
-  source = "github.com/ibm-garage-cloud/terraform-tools-argocd.git?ref=v1.0.0"
-
-  cluster_config_file = module.dev_cluster.config_file_path
-  cluster_type        = module.dev_cluster.type
-  app_namespace       = module.dev_cluster_namespaces.tools_namespace_name
-  ingress_subdomain   = module.dev_cluster.ingress_hostname
-  olm_namespace       = module.dev_software_olm.olm_namespace
-  operator_namespace  = module.dev_software_olm.target_namespace
-  name                = "argocd"
-}
+module "dev_subnet" {
+  source = "github.com/cloud-native-toolkit/terraform-ibm-vpc-subnets.git?ref=v1.0.3"
+  
+  resource_group_id   = module.resource_groups.id
+  vpc_name            = module.vpc.name
+  acl_id              = module.vpc.acl_id
+  gateways            = module.gateways.gateways
+  _count              = var.vpc_subnet_count
+  region              = var.region
+  label               = var.label
+  ibmcloud_api_key    = var.ibmcloud_api_key
 ```
-
