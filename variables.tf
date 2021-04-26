@@ -49,7 +49,7 @@ variable "ipv4_cidr_blocks" {
 }
 
 variable "ipv4_address_count" {
-  type        = string
+  type        = number
   description = "The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored."
-  default     = "256"
+  default     = 256
 }
