@@ -41,6 +41,15 @@ resource ibm_is_subnet vpc_subnet_total_count {
   network_acl              = var.acl_id
 }
 
+resource null_resource print_subnet_count_names {
+  for_each = ibm_is_subnet.vpc_subnet_total_count
+
+  provisioner "local-exec" {
+    command = "echo 'Provisioned subnet: ${each.value.name}'"
+  }
+}
+
+
 resource ibm_is_vpc_address_prefix cidr_prefix {
   count = var.provision && local.ipv4_cidr_provided ? var._count : 0
 
@@ -63,9 +72,17 @@ resource ibm_is_subnet vpc_subnet_cidr_block {
   ipv4_cidr_block = local.ipv4_cidr_block[count.index]
 }
 
+resource null_resource print_subnet_cidr_names {
+  for_each = ibm_is_subnet.vpc_subnet_cidr_block
+
+  provisioner "local-exec" {
+    command = "echo 'Provisioned subnet: ${each.value.name}'"
+  }
+}
+
 data ibm_is_subnet vpc_subnet {
   count = var._count
-  depends_on = [ibm_is_subnet.vpc_subnet_cidr_block, ibm_is_subnet.vpc_subnet_total_count]
+  depends_on = [null_resource.print_subnet_cidr_names, null_resource.print_subnet_count_names]
 
   name  = "${local.name_prefix}${format("%02s", count.index)}"
 }
