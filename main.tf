@@ -42,7 +42,7 @@ resource ibm_is_subnet vpc_subnet_total_count {
 }
 
 resource null_resource print_subnet_count_names {
-  for_each = ibm_is_subnet.vpc_subnet_total_count[*].name
+  for_each = toset(ibm_is_subnet.vpc_subnet_total_count[*].name)
 
   provisioner "local-exec" {
     command = "echo 'Provisioned subnet: ${each.value}'"
@@ -73,7 +73,7 @@ resource ibm_is_subnet vpc_subnet_cidr_block {
 }
 
 resource null_resource print_subnet_cidr_names {
-  for_each = ibm_is_subnet.vpc_subnet_cidr_block[*].name
+  for_each = toset(ibm_is_subnet.vpc_subnet_cidr_block[*].name)
 
   provisioner "local-exec" {
     command = "echo 'Provisioned subnet: ${each.value}'"
