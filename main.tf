@@ -7,6 +7,7 @@ locals {
   ipv4_cidr_block    = local.ipv4_cidr_provided ? var.ipv4_cidr_blocks : [ for index in range(var._count): "" ]
   name_prefix        = "${var.vpc_name}-subnet-${var.label}"
   subnet_output      = var.provision ? (local.ipv4_cidr_provided ? ibm_is_subnet.vpc_subnet_cidr_block : ibm_is_subnet.vpc_subnet_total_count) : data.ibm_is_subnet.vpc_subnet
+  security_group     = var.provision ? ibm_is_security_group.security_group[0] : data.ibm_is_security_group.security_group[0]
 }
 
 resource null_resource print_names {
@@ -50,7 +51,6 @@ resource null_resource print_subnet_count_names {
   }
 }
 
-
 resource ibm_is_vpc_address_prefix cidr_prefix {
   count = var.provision && local.ipv4_cidr_provided ? var._count : 0
 
@@ -81,9 +81,23 @@ resource null_resource print_subnet_cidr_names {
   }
 }
 
+resource ibm_is_security_group security_group {
+  count = var.provision ? var._count : 0
+
+  name           = local.name_prefix
+  vpc            = data.ibm_is_vpc.vpc.id
+  resource_group = var.resource_group_id
+}
+
 data ibm_is_subnet vpc_subnet {
   count = !var.provision ? var._count : 0
   depends_on = [null_resource.print_subnet_cidr_names, null_resource.print_subnet_count_names]
 
   name  = "${local.name_prefix}${format("%02s", count.index)}"
+}
+
+data ibm_is_security_group security_group {
+  count = !var.provision ? var._count : 0
+
+  name           = local.name_prefix
 }
