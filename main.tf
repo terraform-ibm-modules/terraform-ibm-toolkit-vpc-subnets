@@ -36,7 +36,7 @@ resource ibm_is_subnet vpc_subnet_total_count {
   name                     = "${local.name_prefix}${format("%02s", count.index)}"
   zone                     = local.vpc_zone_names[count.index]
   vpc                      = data.ibm_is_vpc.vpc.id
-  public_gateway           = coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
+  public_gateway           = local.gateway_count == 0 ? null : coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
   total_ipv4_address_count = var.ipv4_address_count
   resource_group           = var.resource_group_id
   network_acl              = var.acl_id
@@ -67,7 +67,7 @@ resource ibm_is_subnet vpc_subnet_cidr_block {
   name            = "${local.name_prefix}${format("%02s", count.index)}"
   zone            = local.vpc_zone_names[count.index]
   vpc             = data.ibm_is_vpc.vpc.id
-  public_gateway  = coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
+  public_gateway  = local.gateway_count == 0 ? null : coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
   resource_group  = var.resource_group_id
   network_acl     = var.acl_id
   ipv4_cidr_block = local.ipv4_cidr_block[count.index]
