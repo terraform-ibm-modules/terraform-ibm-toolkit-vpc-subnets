@@ -4,7 +4,8 @@ module "cos" {
 
   resource_group_name = var.resource_group_name
   name_prefix         = var.name_prefix
-  name                = "flow-log-cos-instance"
+  name                = "toolkit-dev-cos"
+  provision           = false
 }
 
 resource null_resource print_cos_id {
@@ -28,8 +29,9 @@ module "dev_cos_bucket" {
   cos_instance_id     = module.cos.id
   name_prefix         = var.name_prefix
   ibmcloud_api_key    = var.ibmcloud_api_key
-  name                = "fl-testing-gsi-vpc"
+  name                = "fl-testing-gsi-vpc-subbnets"
   region              = var.region
+  provision           = false
 }
 
 resource null_resource print_bucket {
