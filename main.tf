@@ -82,6 +82,7 @@ resource null_resource print_subnet_cidr_names {
 }
 
 data ibm_is_subnet vpc_subnet {
+  count = var._count
   depends_on = [null_resource.print_subnet_cidr_names, null_resource.print_subnet_count_names]
 
   name  = "${local.name_prefix}${format("%02s", count.index)}"
