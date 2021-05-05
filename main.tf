@@ -87,3 +87,13 @@ data ibm_is_subnet vpc_subnet {
 
   name  = "${local.name_prefix}${format("%02s", count.index)}"
 }
+
+resource ibm_is_flow_log flowlog_instance {
+  count = (var.flow_log_cos_bucket_name != "" && var.provision) ? var._count : 0
+
+  name = "${local.name_prefix}${format("%02s", count.index)}-flowlog"
+  active = true
+  target = data.ibm_is_subnet.vpc_subnet[count.index].id
+  resource_group = var.resource_group_id
+  storage_bucket = var.flow_log_cos_bucket_name
+}
