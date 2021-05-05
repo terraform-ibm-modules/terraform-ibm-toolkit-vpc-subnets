@@ -82,14 +82,14 @@ resource null_resource print_subnet_cidr_names {
 }
 
 data ibm_is_subnet vpc_subnet {
-  count = var._count
+  count = !var.provision ? var._count : 0
   depends_on = [null_resource.print_subnet_cidr_names, null_resource.print_subnet_count_names]
 
   name  = "${local.name_prefix}${format("%02s", count.index)}"
 }
 
 resource ibm_is_flow_log flowlog_instance {
-  count = (var.flow_log_cos_bucket_name != "" && var.provision) ? var._count : 0
+  count = (var.flow_log_cos_bucket_name != "") ? var._count : 0
 
   name = "${local.name_prefix}${format("%02s", count.index)}-flowlog"
   active = true
