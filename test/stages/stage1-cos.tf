@@ -29,8 +29,9 @@ module "dev_cos_bucket" {
   cos_instance_id     = module.cos.id
   name_prefix         = var.name_prefix
   ibmcloud_api_key    = var.ibmcloud_api_key
-  name                = "fl-testing-gsi-vpc-subbnets"
+  name                = "testing-flowlog-bucket"
   region              = var.region
+  provision           = false
 }
 
 resource null_resource print_bucket {
