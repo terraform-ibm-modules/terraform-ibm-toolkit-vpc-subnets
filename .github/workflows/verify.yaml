@@ -20,6 +20,7 @@ jobs:
         platform:
           - vpc_count
           - vpc_count_cidr
+      max-parallel: 1
       fail-fast: false
 
     env:
