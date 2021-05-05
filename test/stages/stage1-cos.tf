@@ -4,7 +4,7 @@ module "cos" {
 
   resource_group_name = var.resource_group_name
   name_prefix         = var.name_prefix
-  name                = "toolkit-dev-cos"
+  name                = "vpc-count-cos"
   provision           = false
 }
 
@@ -31,7 +31,6 @@ module "dev_cos_bucket" {
   ibmcloud_api_key    = var.ibmcloud_api_key
   name                = "fl-testing-gsi-vpc-subbnets"
   region              = var.region
-  provision           = false
 }
 
 resource null_resource print_bucket {
