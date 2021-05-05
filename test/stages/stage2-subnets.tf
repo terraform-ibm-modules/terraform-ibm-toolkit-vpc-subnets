@@ -11,5 +11,5 @@ module "subnets" {
   label              = "cluster"
   ipv4_cidr_blocks   = tolist(setsubtract(split(",", var.ipv4_cidr_blocks), [""]))
   ipv4_address_count = var.ipv4_address_count
-  flow_log_cos_bucket_name = module.dev_cos_bucket.bucket_name
+  flow_log_cos_bucket_name = "testing-flowlog-bucket"
 }
