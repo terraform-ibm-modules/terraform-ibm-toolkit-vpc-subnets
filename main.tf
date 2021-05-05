@@ -89,11 +89,11 @@ data ibm_is_subnet vpc_subnet {
 }
 
 resource ibm_is_flow_log flowlog_instance {
-  count = (var.flow_log_cos_bucket_name != "") ? var._count : 0
+  count = (var.flow_log_cos_bucket_name != "" && var.provision && !local.ipv4_cidr_provided) ? var._count : 0
 
   name = "${local.name_prefix}${format("%02s", count.index)}-flowlog"
   active = true
-  target = data.ibm_is_subnet.vpc_subnet[count.index].id
+  target = ibm_is_subnet.vpc_subnet_total_count[count.index].id
   resource_group = var.resource_group_id
   storage_bucket = var.flow_log_cos_bucket_name
 }
