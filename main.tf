@@ -6,7 +6,7 @@ locals {
   name_prefix        = "${var.vpc_name}-subnet-${var.label}"
   subnet_output      = var.provision ? ibm_is_subnet.vpc_subnets : data.ibm_is_subnet.vpc_subnet
   ipv4_cidr_provided = length(var.ipv4_cidr_blocks) >= var._count
-  ipv4_cidr_block    = local.ipv4_cidr_provided ? var.ipv4_cidr_blocks : [ for val in range(var._count): null ]
+  ipv4_cidr_block    = local.ipv4_cidr_provided ? [ for obj in var.ipv4_cidr_blocks: obj.cidr ] : [ for val in range(var._count): null ]
   total_ipv4_address_count = local.ipv4_cidr_provided ? null : var.ipv4_address_count
 }
 
