@@ -19,6 +19,11 @@ variable "vpc_name" {
   description = "The name of the vpc instance"
 }
 
+variable "vpc_id" {
+  type        = string
+  description = "The id of the vpc instance"
+}
+
 variable "zone_offset" {
   type        = number
   description = "The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1"

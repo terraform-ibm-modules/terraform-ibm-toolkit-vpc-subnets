@@ -31,17 +31,11 @@ resource null_resource print_names {
   }
 }
 
-data ibm_is_vpc vpc {
-  depends_on = [null_resource.print_names]
-
-  name  = var.vpc_name
-}
-
 resource ibm_is_network_acl subnet_acl {
   count = var.provision ? 1 : 0
 
   name = local.name_prefix
-  vpc  = data.ibm_is_vpc.vpc.id
+  vpc  = var.vpc_id
 }
 
 resource ibm_is_subnet vpc_subnets {
@@ -49,7 +43,7 @@ resource ibm_is_subnet vpc_subnets {
 
   name                     = "${local.name_prefix}${format("%02s", count.index)}"
   zone                     = local.vpc_zone_names[count.index]
-  vpc                      = data.ibm_is_vpc.vpc.id
+  vpc                      = var.vpc_id
   public_gateway           = local.gateway_count == 0 ? null : coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
   total_ipv4_address_count = local.total_ipv4_address_count
   ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
