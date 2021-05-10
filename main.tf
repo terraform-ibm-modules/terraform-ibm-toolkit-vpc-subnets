@@ -128,7 +128,7 @@ resource ibm_is_network_acl subnet_acl {
       destination = rules.value["destination"]
 
       dynamic "tcp" {
-        for_each = lookup(rules.value, "tcp", null) != null ? lookup(rules.value, "tcp", null) : []
+        for_each = lookup(rules.value, "tcp", null) != null ? [ lookup(rules.value, "tcp", null) ] : []
 
         content {
           port_min = tcp.value["port_min"]
@@ -139,7 +139,7 @@ resource ibm_is_network_acl subnet_acl {
       }
 
       dynamic "udp" {
-        for_each = lookup(rules.value, "udp", null) != null ? lookup(rules.value, "udp", null) : []
+        for_each = lookup(rules.value, "udp", null) != null ? [ lookup(rules.value, "udp", null) ] : []
 
         content {
           port_min = udp.value["port_min"]
@@ -150,7 +150,7 @@ resource ibm_is_network_acl subnet_acl {
       }
 
       dynamic "icmp" {
-        for_each = lookup(rules.value, "icmp", null) != null ? lookup(rules.value, "icmp", null) : []
+        for_each = lookup(rules.value, "icmp", null) != null ? [ lookup(rules.value, "icmp", null) ] : []
 
         content {
           type = icmp.value["type"]
