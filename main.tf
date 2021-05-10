@@ -23,12 +23,6 @@ resource null_resource print_names {
   provisioner "local-exec" {
     command = "echo 'IPv4 cidr blocks: ${jsonencode(local.ipv4_cidr_block)}'"
   }
-  provisioner "local-exec" {
-    command = "echo 'Bucket name: ${var.flow_log_cos_bucket_name}'"
-  }
-  provisioner "local-exec" {
-    command = "echo 'Flow-log auth id: ${var.auth_id}'"
-  }
 }
 
 resource ibm_is_network_acl subnet_acl {
@@ -64,15 +58,4 @@ data ibm_is_subnet vpc_subnet {
   depends_on = [null_resource.print_subnet_names]
 
   name  = "${local.name_prefix}${format("%02s", count.index)}"
-}
-
-resource ibm_is_flow_log flowlog_instance {
-  depends_on = [null_resource.print_names]
-  count = (var.flow_log_cos_bucket_name != "" && var.provision) ? var._count : 0
-
-  name = "${local.name_prefix}${format("%02s", count.index)}-flowlog"
-  active = true
-  target = local.subnet_output[count.index].id
-  resource_group = var.resource_group_id
-  storage_bucket = var.flow_log_cos_bucket_name
 }

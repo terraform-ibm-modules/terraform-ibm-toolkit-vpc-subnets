@@ -65,15 +65,3 @@ variable "provision" {
   description = "Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up."
   default     = true
 }
-
-variable "flow_log_cos_bucket_name" {
-  type        = string
-  description = "Cloud Object Storage bucket id for flow logs (optional)"
-  default     = ""
-}
-
-variable "auth_id" {
-  type        = string
-  description = "The id of the authorization policy that allows the Flow Log to access the Object Storage bucket. This is optional and provided to sequence the authorization before the flow log creation."
-  default     = ""
-}
