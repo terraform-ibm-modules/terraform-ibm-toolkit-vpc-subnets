@@ -154,7 +154,7 @@ resource ibm_is_network_acl subnet_acl {
 
         content {
           type = icmp.value["type"]
-          code = icmp.value["code"] != null ? icmp.value["code"] : null
+          code = lookup(icmp.value, "code", null)
         }
       }
     }
