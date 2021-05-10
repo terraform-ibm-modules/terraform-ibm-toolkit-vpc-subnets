@@ -130,26 +130,32 @@ resource ibm_is_network_acl subnet_acl {
       dynamic "tcp" {
         for_each = lookup(rules.value, "tcp", null) != null ? lookup(rules.value, "tcp", null) : []
 
-        port_min = tcp.value["port_min"]
-        port_max = tcp.value["port_max"]
-        source_port_min = tcp.value["source_port_min"]
-        source_port_max = tcp.value["source_port_max"]
+        content {
+          port_min = tcp.value["port_min"]
+          port_max = tcp.value["port_max"]
+          source_port_min = tcp.value["source_port_min"]
+          source_port_max = tcp.value["source_port_max"]
+        }
       }
 
       dynamic "udp" {
         for_each = lookup(rules.value, "udp", null) != null ? lookup(rules.value, "udp", null) : []
 
-        port_min = udp.value["port_min"]
-        port_max = udp.value["port_max"]
-        source_port_min = udp.value["source_port_min"]
-        source_port_max = udp.value["source_port_max"]
+        content {
+          port_min = udp.value["port_min"]
+          port_max = udp.value["port_max"]
+          source_port_min = udp.value["source_port_min"]
+          source_port_max = udp.value["source_port_max"]
+        }
       }
 
       dynamic "icmp" {
         for_each = lookup(rules.value, "icmp", null) != null ? lookup(rules.value, "icmp", null) : []
 
-        type = icmp.value["type"]
-        code = icmp.value["code"] != null ? icmp.value["code"] : null
+        content {
+          type = icmp.value["type"]
+          code = icmp.value["code"] != null ? icmp.value["code"] : null
+        }
       }
     }
   }
