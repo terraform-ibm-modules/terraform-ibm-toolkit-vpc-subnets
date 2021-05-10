@@ -8,6 +8,11 @@ output "ids" {
   value       = local.subnet_output[*].id
 }
 
+output "names" {
+  description = "The ids of the created subnets"
+  value       = local.subnet_output[*].name
+}
+
 output "subnets" {
   description = "The subnets that were created"
   value       = [ for subnet in local.subnet_output: {id = subnet.id, zone = subnet.zone, label = var.label} ]
