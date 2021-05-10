@@ -65,3 +65,31 @@ variable "provision" {
   description = "Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up."
   default     = true
 }
+
+variable "acl_rules" {
+  # type = list(object({
+  #   name=string,
+  #   action=string,
+  #   direction=string,
+  #   source=string,
+  #   destination=string,
+  #   tcp=optional(object({
+  #     port_min=number,
+  #     port_max=number,
+  #     source_port_min=number,
+  #     source_port_max=number
+  #   })),
+  #   udp=optional(object({
+  #     port_min=number,
+  #     port_max=number,
+  #     source_port_min=number,
+  #     source_port_max=number
+  #   })),
+  #   icmp=optional(object({
+  #     type=number,
+  #     code=optional(number)
+  #   })),
+  # }))
+  description = "List of rules to set on the subnet access control list"
+  default = []
+}
