@@ -33,7 +33,7 @@ locals {
       source_port_max = 443
     }
   }, {
-    name = "ingress-DNS"
+    name = "ingress-dns"
     action = "allow"
     direction = "inbound"
     source = "0.0.0.0/0"
@@ -75,7 +75,7 @@ locals {
       source_port_max = 443
     }
   }, {
-    name = "egress-DNS"
+    name = "egress-dns"
     action = "allow"
     direction = "outbound"
     destination = "0.0.0.0/0"
