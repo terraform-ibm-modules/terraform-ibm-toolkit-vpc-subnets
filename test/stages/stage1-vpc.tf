@@ -7,5 +7,5 @@ module "vpc" {
   name_prefix         = var.name_prefix
   ibmcloud_api_key    = var.ibmcloud_api_key
   address_prefix_count = var.address_prefix_count
-  address_prefixes = tolist(setsubtract(split(",", var.address_prefixes), [""]))
+  address_prefixes = jsondecode(var.address_prefixes)
 }
