@@ -57,7 +57,7 @@ variable "ipv4_address_count" {
 }
 
 variable "address_prefixes" {
-  default = ""
+  default = "[]"
 }
 
 variable "address_prefix_count" {
