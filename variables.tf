@@ -19,11 +19,6 @@ variable "vpc_name" {
   description = "The name of the vpc instance"
 }
 
-variable "vpc_id" {
-  type        = string
-  description = "The id of the vpc instance"
-}
-
 variable "zone_offset" {
   type        = number
   description = "The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1"
@@ -49,7 +44,7 @@ variable "gateways" {
 }
 
 variable "ipv4_cidr_blocks" {
-  type        = list(object({cidr = string}))
+  type        = list(string)
   description = "List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value."
   default     = []
 }

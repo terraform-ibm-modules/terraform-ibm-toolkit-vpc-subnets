@@ -6,7 +6,7 @@ locals {
   name_prefix        = "${var.vpc_name}-subnet-${var.label}"
   subnet_output      = var.provision ? ibm_is_subnet.vpc_subnets : data.ibm_is_subnet.vpc_subnet
   ipv4_cidr_provided = length(var.ipv4_cidr_blocks) >= var._count
-  ipv4_cidr_block    = local.ipv4_cidr_provided ? [ for obj in var.ipv4_cidr_blocks: obj.cidr ] : [ for val in range(var._count): null ]
+  ipv4_cidr_block    = local.ipv4_cidr_provided ? var.ipv4_cidr_blocks : [ for val in range(var._count): null ]
   total_ipv4_address_count = local.ipv4_cidr_provided ? null : var.ipv4_address_count
   default_acl_rules  = [{
     name = "ingress-http"
@@ -111,11 +111,17 @@ resource null_resource print_names {
   }
 }
 
+data ibm_is_vpc vpc {
+  depends_on = [null_resource.print_names]
+
+  name = var.vpc_name
+}
+
 resource ibm_is_network_acl subnet_acl {
   count = var.provision ? 1 : 0
 
   name = local.name_prefix
-  vpc  = var.vpc_id
+  vpc  = data.ibm_is_vpc.vpc.id
 
   dynamic "rules" {
     for_each = local.acl_rules
@@ -166,7 +172,7 @@ resource ibm_is_subnet vpc_subnets {
 
   name                     = "${local.name_prefix}${format("%02s", count.index)}"
   zone                     = local.vpc_zone_names[count.index]
-  vpc                      = var.vpc_id
+  vpc                      = data.ibm_is_vpc.vpc.id
   public_gateway           = local.gateway_count == 0 ? null : coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
   total_ipv4_address_count = local.total_ipv4_address_count
   ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
