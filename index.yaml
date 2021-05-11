@@ -84,7 +84,7 @@ versions:
         default: true
         optional: true
       - name: acl_rules
-        type: string
+        type: list(object({}))
         description: List of rules to set on the subnet access control list
         default: []
         optional: true
