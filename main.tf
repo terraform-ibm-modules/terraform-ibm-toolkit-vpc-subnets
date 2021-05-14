@@ -122,6 +122,7 @@ resource ibm_is_network_acl subnet_acl {
 
   name = local.name_prefix
   vpc  = data.ibm_is_vpc.vpc.id
+  resource_group = var.resource_group_id
 
   dynamic "rules" {
     for_each = local.acl_rules
