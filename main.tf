@@ -9,89 +9,35 @@ locals {
   ipv4_cidr_block    = local.ipv4_cidr_provided ? var.ipv4_cidr_blocks : [ for val in range(var._count): null ]
   total_ipv4_address_count = local.ipv4_cidr_provided ? null : var.ipv4_address_count
   default_acl_rules  = [{
-    name = "ingress-http"
-    action = "allow"
-    direction = "inbound"
-    source = "0.0.0.0/0"
-    destination = "10.0.0.0/8"
-    tcp = {
-      port_min = 80
-      port_max = 80
-      source_port_min = 80
-      source_port_max = 80
-    }
-  }, {
-    name = "ingress-https"
-    action = "allow"
-    direction = "inbound"
-    source = "0.0.0.0/0"
-    destination = "10.0.0.0/8"
-    tcp = {
-      port_min = 443
-      port_max = 443
-      source_port_min = 443
-      source_port_max = 443
-    }
-  }, {
-    name = "ingress-dns"
-    action = "allow"
-    direction = "inbound"
-    source = "0.0.0.0/0"
-    destination = "10.0.0.0/8"
-    tcp = {
-      port_min = 53
-      port_max = 53
-      source_port_min = 53
-      source_port_max = 53
-    }
-  }, {
-    name = "ingress-internal"
+    name = "allow-ingress-internal"
     action = "allow"
     direction = "inbound"
     source = "10.0.0.0/8"
     destination = "10.0.0.0/8"
   }, {
-    name = "egress-http"
+    name = "allow-egress-internal"
     action = "allow"
     direction = "outbound"
-    destination = "0.0.0.0/0"
     source = "10.0.0.0/8"
-    tcp = {
-      port_min = 80
-      port_max = 80
-      source_port_min = 80
-      source_port_max = 80
-    }
-  }, {
-    name = "egress-https"
-    action = "allow"
-    direction = "outbound"
-    destination = "0.0.0.0/0"
-    source = "10.0.0.0/8"
-    tcp = {
-      port_min = 443
-      port_max = 443
-      source_port_min = 443
-      source_port_max = 443
-    }
-  }, {
-    name = "egress-dns"
-    action = "allow"
-    direction = "outbound"
-    destination = "0.0.0.0/0"
-    source = "10.0.0.0/8"
-    tcp = {
-      port_min = 53
-      port_max = 53
-      source_port_min = 53
-      source_port_max = 53
-    }
-  }, {
-    name = "egress-internal"
-    action = "allow"
-    direction = "outbound"
     destination = "10.0.0.0/8"
+  }, {
+    name = "allow-roks-egress"
+    action = "allow"
+    direction = "outbound"
     source = "10.0.0.0/8"
+    destination = "166.8.0.0/14"
+  }, {
+    name = "allow-vse-egress"
+    action = "allow"
+    direction = "outbound"
+    source = "10.0.0.0/8"
+    destination = "161.26.0.0/16"
+  }, {
+    name = "allow-iaas-egress"
+    action = "allow"
+    direction = "outbound"
+    source = "10.0.0.0/8"
+    destination = "166.8.0.0/14"
   }]
   acl_rules = concat(local.default_acl_rules, var.acl_rules)
 }
