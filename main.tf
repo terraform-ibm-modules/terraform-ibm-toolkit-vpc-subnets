@@ -44,10 +44,10 @@ locals {
 
 resource null_resource print_names {
   provisioner "local-exec" {
-    command = "echo 'Resource group: ${var.resource_group_id}'"
+    command = "echo 'Resource group: ${var.resource_group_id != null ? var.resource_group_id : "null"}'"
   }
   provisioner "local-exec" {
-    command = "echo 'VPC name: ${var.vpc_name}'"
+    command = "echo 'VPC name: ${var.vpc_name != null ? var.vpc_name : "null"}'"
   }
   provisioner "local-exec" {
     command = "echo 'IPv4 address count: ${var.ipv4_address_count}'"
@@ -131,7 +131,7 @@ resource null_resource print_subnet_names {
   for_each = toset(ibm_is_subnet.vpc_subnets[*].name)
 
   provisioner "local-exec" {
-    command = "echo 'Provisioned subnet: ${each.value}'"
+    command = "echo 'Provisioned subnet: ${each.value != null ? each.value : "null"}'"
   }
 }
 
