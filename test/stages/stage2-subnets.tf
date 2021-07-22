@@ -1,4 +1,4 @@
-module "subnets" {
+module subnets {
   source = "./module"
 
   resource_group_id  = module.resource_group.id

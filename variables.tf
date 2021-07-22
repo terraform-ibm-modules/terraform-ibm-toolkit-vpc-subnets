@@ -1,67 +1,73 @@
 # Resource Group Variables
-variable "resource_group_id" {
+variable resource_group_id {
   type        = string
   description = "The id of the IBM Cloud resource group where the VPC has been provisioned."
 }
 
-variable "region" {
+variable region {
   type        = string
   description = "The IBM Cloud region where the cluster will be/has been installed."
 }
 
-variable "ibmcloud_api_key" {
+variable ibmcloud_api_key {
+  sensitive   = true
   type        = string
   description = "The IBM Cloud api token"
 }
 
-variable "vpc_name" {
+variable vpc_name {
   type        = string
   description = "The name of the vpc instance"
 }
 
-variable "zone_offset" {
-  type        = number
-  description = "The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1"
-  default     = 0
-}
-
-variable "_count" {
-  type        = number
-  description = "The number of subnets that should be provisioned"
-  default     = 3
-}
-
-variable "label" {
+variable label {
   type        = string
   description = "Label for the subnets created"
   default     = "default"
 }
 
-variable "gateways" {
+variable gateways {
   type        = list(object({id = string, zone = string}))
   description = "List of gateway ids and zones"
   default     = []
 }
 
-variable "ipv4_cidr_blocks" {
+variable acl_id {
+  type        = string
+  description = "Use existing ACL for subnets"
+  default     = ""
+}
+
+variable subnets {
+  description = "A map describing the subnets to be provisioned. Lists can contain IPV4 CIDR Blocks or total ipv4 address counts"
+  default     = {
+    # type = object({
+    #   zone-1 = list(string)
+    #   zone-2 = list(string)
+    #   zone-3 = list(string)
+    # })
+    zone-1 = [
+      "10.10.10.0/24",
+      256
+    ],
+
+    zone-2 = [
+      "10.40.10.0/24"
+    ],
+
+    zone-3 = [
+      "10.70.10.0/24"
+    ]
+  }
+}
+
+variable subnet_data {
+  description = "A list of subnets to get from a data block. Conflicts with `subnets`."
   type        = list(string)
-  description = "List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value."
   default     = []
 }
 
-variable "ipv4_address_count" {
-  type        = number
-  description = "The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored."
-  default     = 256
-}
-
-variable "provision" {
-  type        = bool
-  description = "Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up."
-  default     = true
-}
-
-variable "acl_rules" {
+variable acl_rules {
   # type = list(object({
   #   name=string,
   #   action=string,
