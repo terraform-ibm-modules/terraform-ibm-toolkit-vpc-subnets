@@ -39,3 +39,30 @@ module "dev_subnet" {
   label               = var.label
   ibmcloud_api_key    = var.ibmcloud_api_key
 ```
+
+## Module Variables
+
+Name              | Type                                       | Description                                                                                                     | Sensitive | Default
+----------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------
+resource_group_id | string                                     | The id of the IBM Cloud resource group where the VPC has been provisioned.                                      |           | 
+region            | string                                     | The IBM Cloud region where the cluster will be/has been installed.                                              |           | 
+ibmcloud_api_key  | string                                     | The IBM Cloud api token                                                                                         | true      | 
+vpc_name          | string                                     | The name of the vpc instance                                                                                    |           | 
+label             | string                                     | Label for the subnets created                                                                                   |           | default
+gateways          | list(object({id = string, zone = string})) | List of gateway ids and zones                                                                                   |           | []
+acl_id            | string                                     | Use existing ACL for subnets                                                                                    |           | 
+subnets           |                                            | A map describing the subnets to be provisioned. Lists can contain IPV4 CIDR Blocks or total ipv4 address counts |           | {<br>zone-1 = [<br>"10.10.10.0/24",<br>256<br>],<br>zone-2 = [<br>"10.40.10.0/24"<br>],<br>zone-3 = [<br>"10.70.10.0/24"<br>]<br>}
+subnet_data       | list(string)                               | A list of subnets to get from a data block. Conflicts with `subnets`.                                           |           | []
+acl_rules         |                                            | List of rules to set on the subnet access control list                                                          |           | []
+
+## Module Outputs
+
+Name     | Description
+-------- | ------------------------------------------------------
+count    | The number of subnets created
+ids      | The ids of the created subnets
+names    | The ids of the created subnets
+subnets  | The subnets that were created
+acl_id   | The id of the network acl for the subnets
+vpc_name | The name of the VPC where the subnets were provisioned
+vpc_id   | The id of the VPC where the subnets were provisioned
