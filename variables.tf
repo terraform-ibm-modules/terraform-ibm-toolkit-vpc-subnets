@@ -1,8 +1,6 @@
-# Resource Group Variables
-variable resource_group_id {
-  type        = string
-  description = "The id of the IBM Cloud resource group where the VPC has been provisioned."
-}
+##############################################################################
+# Provider Variables
+##############################################################################
 
 variable region {
   type        = string
@@ -15,16 +13,42 @@ variable ibmcloud_api_key {
   description = "The IBM Cloud api token"
 }
 
+##############################################################################
+
+
+##############################################################################
+# Resource Group Variables
+##############################################################################
+
+variable resource_group_id {
+  type        = string
+  description = "The id of the IBM Cloud resource group where the VPC has been provisioned."
+}
+
+##############################################################################
+
+
+##############################################################################
+# VPC Variables
+##############################################################################
+
 variable vpc_name {
   type        = string
   description = "The name of the vpc instance"
 }
 
-variable label {
+variable acl_id {
   type        = string
-  description = "Label for the subnets created"
-  default     = "default"
+  description = "Optional. Use existing ACL for subnets"
+  default     = ""
 }
+
+##############################################################################
+
+
+##############################################################################
+# Public Gateway Variables
+##############################################################################
 
 variable gateways {
   type        = list(object({id = string, zone = string}))
@@ -32,10 +56,17 @@ variable gateways {
   default     = []
 }
 
-variable acl_id {
+##############################################################################
+
+
+##############################################################################
+# Subnet Variables
+##############################################################################
+
+variable label {
   type        = string
-  description = "Use existing ACL for subnets"
-  default     = ""
+  description = "Label for the subnets created"
+  default     = "default"
 }
 
 variable subnets {
@@ -91,6 +122,6 @@ variable acl_rules {
   #     code=optional(number)
   #   })),
   # }))
-  description = "List of rules to set on the subnet access control list"
+  description = "List of rules to set on the subnet access control list. Conflicts with `acl_id`"
   default = []
 }
