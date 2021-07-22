@@ -1,4 +1,4 @@
-module "vpc" {
+module vpc {
   source = "github.com/cloud-native-toolkit/terraform-ibm-vpc.git"
 
   resource_group_id   = module.resource_group.id
