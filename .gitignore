@@ -5,3 +5,5 @@
 .terraform
 
 module
+terraform.tfvars
+.terraform.lock.hcl
