@@ -39,5 +39,6 @@ versions:
       scope: global
     - name: _count
       scope: module
+      important: true
     - name: label
       scope: module
