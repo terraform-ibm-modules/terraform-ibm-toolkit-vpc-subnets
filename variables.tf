@@ -9,11 +9,6 @@ variable "region" {
   description = "The IBM Cloud region where the cluster will be/has been installed."
 }
 
-variable "ibmcloud_api_key" {
-  type        = string
-  description = "The IBM Cloud api token"
-}
-
 variable "vpc_name" {
   type        = string
   description = "The name of the vpc instance"

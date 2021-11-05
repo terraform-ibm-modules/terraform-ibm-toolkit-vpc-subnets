@@ -2,6 +2,8 @@
 
 Terraform module to provision subnets for an existing VPC. The number of subnets created depends on the value provided for `_count`. The created subnets will be named after the vpc with a suffix based on the value provided for `label`. Optionally, if values are provided for `gateways` then the subnets will be created with a public gateway.
 
+**Note:** This module follows the Terraform conventions regarding how provider configuration is defined within the Terraform template and passed into the module - https://www.terraform.io/docs/language/modules/develop/providers.html. The default provider configuration flows through to the module. If different configuration is required for a module, it can be explicitly passed in the `providers` block of the module - https://www.terraform.io/docs/language/modules/develop/providers.html#passing-providers-explicitly.
+
 ## Software dependencies
 
 The module depends on the following software components:
@@ -27,6 +29,20 @@ This module makes use of the output from other modules:
 ## Example usage
 
 ```hcl-terraform
+terraform {
+  required_providers {
+    ibm = {
+      source = "ibm-cloud/ibm"
+    }
+  }
+  required_version = ">= 0.13"
+}
+
+provider "ibm" {
+  ibmcloud_api_key = var.ibmcloud_api_key
+  region = var.region
+}
+
 module "dev_subnet" {
   source = "github.com/cloud-native-toolkit/terraform-ibm-vpc-subnets.git?ref=v1.0.3"
   

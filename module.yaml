@@ -7,6 +7,9 @@ tags:
     - vpc
 versions:
 - platforms: []
+  providers:
+    - name: ibm
+      source: "ibm-cloud/ibm"
   dependencies:
     - id: resource-group
       refs:
@@ -34,8 +37,6 @@ versions:
         output: gateways
       optional: true
     - name: region
-      scope: global
-    - name: ibmcloud_api_key
       scope: global
     - name: _count
       scope: module
