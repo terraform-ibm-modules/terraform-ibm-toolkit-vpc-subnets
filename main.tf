@@ -9,37 +9,37 @@ locals {
   ipv4_cidr_block    = local.ipv4_cidr_provided ? var.ipv4_cidr_blocks : [ for val in range(var._count): null ]
   total_ipv4_address_count = local.ipv4_cidr_provided ? null : var.ipv4_address_count
   default_acl_rules  = [{
-    name = "allow-ingress-internal"
+    name = "${locals.name_prefix}-allow-ingress-internal"
     action = "allow"
     direction = "inbound"
     source = "10.0.0.0/8"
     destination = "10.0.0.0/8"
   }, {
-    name = "allow-roks-ingress"
+    name = "${locals.name_prefix}-allow-roks-ingress"
     action = "allow"
     direction = "inbound"
     source = "166.8.0.0/14"
     destination = "10.0.0.0/8"
   }, {
-    name = "allow-vse-ingress"
+    name = "${locals.name_prefix}-allow-vse-ingress"
     action = "allow"
     direction = "inbound"
     source = "161.26.0.0/16"
     destination = "10.0.0.0/8"
   }, {
-    name = "allow-egress-internal"
+    name = "${locals.name_prefix}-allow-egress-internal"
     action = "allow"
     direction = "outbound"
     source = "10.0.0.0/8"
     destination = "10.0.0.0/8"
   }, {
-    name = "allow-roks-egress"
+    name = "${locals.name_prefix}-allow-roks-egress"
     action = "allow"
     direction = "outbound"
     source = "10.0.0.0/8"
     destination = "166.8.0.0/14"
   }, {
-    name = "allow-vse-egress"
+    name = "${locals.name_prefix}-allow-vse-egress"
     action = "allow"
     direction = "outbound"
     source = "10.0.0.0/8"
