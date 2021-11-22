@@ -15,6 +15,18 @@ locals {
     source = "10.0.0.0/8"
     destination = "10.0.0.0/8"
   }, {
+    name = "allow-roks-ingress"
+    action = "allow"
+    direction = "inbound"
+    source = "166.8.0.0/14"
+    destination = "10.0.0.0/8"
+  }, {
+    name = "allow-vse-ingress"
+    action = "allow"
+    direction = "inbound"
+    source = "161.26.0.0/16"
+    destination = "10.0.0.0/8"
+  }, {
     name = "allow-egress-internal"
     action = "allow"
     direction = "outbound"
@@ -32,12 +44,6 @@ locals {
     direction = "outbound"
     source = "10.0.0.0/8"
     destination = "161.26.0.0/16"
-  }, {
-    name = "allow-iaas-egress"
-    action = "allow"
-    direction = "outbound"
-    source = "10.0.0.0/8"
-    destination = "166.8.0.0/14"
   }]
   acl_rules = concat(local.default_acl_rules, var.acl_rules)
 }
