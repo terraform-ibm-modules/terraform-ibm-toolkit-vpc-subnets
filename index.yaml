@@ -10,16 +10,117 @@ versions:
   - platforms: []
     providers:
       - name: ibm
-        source: "ibm-cloud/ibm"
+        source: ibm-cloud/ibm
     dependencies:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
+      - id: gateways
+        refs: []
+        optional: true
+    variables:
+      - name: resource_group_id
+        type: string
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
+        moduleRef:
+          id: resource-group
+          output: id
+      - name: region
+        type: string
+        description: The IBM Cloud region where the cluster will be/has been installed.
+        scope: global
+      - name: vpc_name
+        type: string
+        description: The name of the vpc instance
+        moduleRef:
+          id: vpc
+          output: name
+      - name: zone_offset
+        type: number
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
+        default: '0'
+      - name: _count
+        type: number
+        description: The number of subnets that should be provisioned
+        default: '3'
+        scope: module
+        important: true
+      - name: label
+        type: string
+        description: Label for the subnets created
+        default: default
+        scope: module
+      - name: gateways
+        type: list(object({id = string, zone = string}))
+        description: List of gateway ids and zones
+        default: '[]'
+        moduleRef:
+          id: gateways
+          output: gateways
+        optional: true
+      - name: ipv4_cidr_blocks
+        type: list(string)
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
+        default: []
+      - name: ipv4_address_count
+        type: number
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        default: '256'
+      - name: provision
+        type: bool
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
+        default: true
+      - name: acl_rules
+        description: List of rules to set on the subnet access control list
+        default: '[]'
+    version: v1.9.5
+    outputs:
+      - name: count
+        description: The number of subnets created
+      - name: ids
+        description: The ids of the created subnets
+      - name: names
+        description: The ids of the created subnets
+      - name: subnets
+        description: The subnets that were created
+      - name: acl_id
+        description: The id of the network acl for the subnets
+      - name: vpc_name
+        description: The name of the VPC where the subnets were provisioned
+      - name: vpc_id
+        description: The id of the VPC where the subnets were provisioned
+  - platforms: []
+    providers:
+      - name: ibm
+        source: ibm-cloud/ibm
+    dependencies:
+      - id: resource-group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
+            version: '>= 1.0.0'
+      - id: vpc
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -29,7 +130,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -63,22 +166,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -111,16 +226,16 @@ versions:
   - platforms: []
     providers:
       - name: ibm
-        source: "ibm-cloud/ibm"
+        source: ibm-cloud/ibm
     dependencies:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -130,7 +245,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -164,22 +281,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -212,16 +341,16 @@ versions:
   - platforms: []
     providers:
       - name: ibm
-        source: "ibm-cloud/ibm"
+        source: ibm-cloud/ibm
     dependencies:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -231,7 +360,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -265,22 +396,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -313,16 +456,16 @@ versions:
   - platforms: []
     providers:
       - name: ibm
-        source: "ibm-cloud/ibm"
+        source: ibm-cloud/ibm
     dependencies:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -332,7 +475,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -366,22 +511,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -414,16 +571,16 @@ versions:
   - platforms: []
     providers:
       - name: ibm
-        source: "ibm-cloud/ibm"
+        source: ibm-cloud/ibm
     dependencies:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -433,7 +590,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -467,22 +626,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -517,11 +688,11 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -531,7 +702,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -569,22 +742,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -619,11 +804,11 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -633,7 +818,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -670,22 +857,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -720,11 +919,11 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -734,7 +933,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -771,22 +972,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -821,11 +1034,11 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -835,7 +1048,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -872,22 +1087,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -918,11 +1145,11 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -932,7 +1159,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -969,22 +1198,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -1015,11 +1256,11 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs: []
         optional: true
@@ -1029,7 +1270,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1066,22 +1309,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -1112,15 +1367,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -1128,7 +1383,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1165,22 +1422,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -1211,15 +1480,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -1227,7 +1496,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1270,22 +1541,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(object({cidr = string}))
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -1316,15 +1599,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -1332,7 +1615,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1375,22 +1660,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(object({cidr = string}))
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: acl_rules
@@ -1421,15 +1718,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -1437,7 +1734,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1480,22 +1779,34 @@ versions:
         optional: true
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(object({cidr = string}))
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
     version: v1.4.0
@@ -1521,20 +1832,21 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
       - id: cos_bucket
         refs:
-          - source: github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket
-            version: ">= 0.0.1"
+          - source: >-
+              github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket
+            version: '>= 0.0.1'
         optional: true
     variables:
       - name: resource_group_id
@@ -1542,7 +1854,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1590,31 +1904,46 @@ versions:
         optional: true
         type: string
         description: Cloud Object Storage bucket id for flow logs (optional)
-        default: ""
+        default: ''
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(object({cidr = string}))
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: auth_id
         type: string
-        description: The id of the authorization policy that allows the Flow Log to access the Object Storage bucket. This is optional and provided to sequence the authorization before the flow log creation.
-        default: ""
+        description: >-
+          The id of the authorization policy that allows the Flow Log to access
+          the Object Storage bucket. This is optional and provided to sequence
+          the authorization before the flow log creation.
+        default: ''
         optional: true
     version: v1.3.1
     outputs:
@@ -1639,20 +1968,21 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
       - id: cos_bucket
         refs:
-          - source: github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket
-            version: ">= 0.0.1"
+          - source: >-
+              github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket
+            version: '>= 0.0.1'
         optional: true
     variables:
       - name: resource_group_id
@@ -1660,7 +1990,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1708,31 +2040,46 @@ versions:
         optional: true
         type: string
         description: Cloud Object Storage bucket id for flow logs (optional)
-        default: ""
+        default: ''
       - name: zone_offset
         type: number
-        description: The offset for the zone where the subnet should be created. The default offset is 0 which means the first subnet should be created in zone xxx-1
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
         default: 0
         optional: true
       - name: ipv4_cidr_blocks
         type: list(object({cidr = string}))
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: auth_id
         type: string
-        description: The id of the authorization policy that allows the Flow Log to access the Object Storage bucket. This is optional and provided to sequence the authorization before the flow log creation.
-        default: ""
+        description: >-
+          The id of the authorization policy that allows the Flow Log to access
+          the Object Storage bucket. This is optional and provided to sequence
+          the authorization before the flow log creation.
+        default: ''
         optional: true
     version: v1.3.0
     outputs:
@@ -1753,20 +2100,21 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
       - id: cos_bucket
         refs:
-          - source: github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket
-            version: ">= 0.0.1"
+          - source: >-
+              github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket
+            version: '>= 0.0.1'
         optional: true
     variables:
       - name: resource_group_id
@@ -1774,7 +2122,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1822,20 +2172,29 @@ versions:
         optional: true
         type: string
         description: Cloud Object Storage bucket id for flow logs (optional)
-        default: ""
+        default: ''
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
     version: v1.2.6
@@ -1851,15 +2210,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -1867,7 +2226,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -1910,23 +2271,32 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
       - name: flow_log_cos_bucket_name
         type: string
         description: Cloud Object Storage bucket id for flow logs (optional)
-        default: ""
+        default: ''
         optional: true
     version: v1.2.5
     outputs:
@@ -1941,15 +2311,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -1957,7 +2327,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2000,17 +2372,26 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
     version: v1.2.4
@@ -2026,15 +2407,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2042,7 +2423,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2085,17 +2468,26 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
     version: v1.2.3
@@ -2111,15 +2503,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2127,7 +2519,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2170,17 +2564,26 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
     version: v1.2.2
@@ -2194,15 +2597,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2210,7 +2613,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2253,17 +2658,26 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
     version: v1.2.1
@@ -2277,15 +2691,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2293,7 +2707,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2336,17 +2752,26 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ["10.10.10.0/24"]). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ["10.10.10.0/24"]). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
       - name: provision
         type: bool
-        description: Flag indicating that the subnet should be provisioned. If 'false' then the subnet will be looked up.
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
         default: true
         optional: true
     version: v1.2.0
@@ -2360,15 +2785,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2376,7 +2801,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2419,12 +2846,19 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ["10.10.10.0/24"]). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ["10.10.10.0/24"]). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
     version: v1.1.1
@@ -2438,15 +2872,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2454,7 +2888,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2497,12 +2933,19 @@ versions:
         optional: true
       - name: ipv4_cidr_blocks
         type: list(string)
-        description: List of ipv4 cidr blocks for the subnets that will be created (e.g. ["10.10.10.0/24"]). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value.
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ["10.10.10.0/24"]). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
         default: []
         optional: true
       - name: ipv4_address_count
         type: number
-        description: The size of the ipv4 cidr block that should be allocated to the subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
         default: 256
         optional: true
     version: v1.1.0
@@ -2516,15 +2959,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2532,7 +2975,9 @@ versions:
           id: resource-group
           output: id
         type: string
-        description: The id of the IBM Cloud resource group where the VPC has been provisioned.
+        description: >-
+          The id of the IBM Cloud resource group where the VPC has been
+          provisioned.
       - name: vpc_name
         moduleRef:
           id: vpc
@@ -2584,15 +3029,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2639,15 +3084,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2698,15 +3143,15 @@ versions:
       - id: resource-group
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: vpc
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
       - id: gateways
         refs:
           - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
-            version: ">= 1.0.0"
+            version: '>= 1.0.0'
         optional: true
     variables:
       - name: resource_group_id
@@ -2755,19 +3200,7 @@ versions:
       - ocp3
       - ocp4
     dependencies: []
-    #    - id: cluster
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-ibm-container-platform
-    #          version: ">= 1.7.0"
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-ocp-cluster
-    #          version: ">= 2.0.0"
-    #    - id: namespace
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-namespace
-    #          version: ">= 2.1.0"
-    #    - id: dashboard
-    #      refs:
-    #        - source: github.com/ibm-garage-cloud/terraform-k8s-dashboard
-    #          version: ">= 1.6.0"
     variables: []
     version: v0.0.0
+interfaces:
+  - github.com/cloud-native-toolkit/automation-modules#ibm-vpc-resource
