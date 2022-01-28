@@ -1,6 +1,8 @@
 name: ibm-vpc-subnets
 type: terraform
 description: Module to provision a collection of subnets for an existing VPC
+interfaces:
+  - github.com/cloud-native-toolkit/automation-modules#ibm-vpc-resource
 tags:
     - network
     - subnets
