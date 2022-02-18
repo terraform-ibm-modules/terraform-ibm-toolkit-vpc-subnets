@@ -47,14 +47,12 @@ locals {
   }]
   acl_rules = concat(local.default_acl_rules, var.acl_rules)
   vpc_id = length(data.ibm_is_vpc.vpc) > 0 ? data.ibm_is_vpc.vpc[0].id : ""
+  resource_group_id = length(data.ibm_resource_group.resource_group) > 0 ? data.ibm_resource_group.resource_group[0].id : ""
 }
 
 resource null_resource print_names {
   count = var.enabled ? 1 : 0
 
-  provisioner "local-exec" {
-    command = "echo 'Resource group: ${var.resource_group_id != null ? var.resource_group_id : "null"}'"
-  }
   provisioner "local-exec" {
     command = "echo 'VPC name: ${var.vpc_name != null ? var.vpc_name : "null"}'"
   }
@@ -64,6 +62,16 @@ resource null_resource print_names {
   provisioner "local-exec" {
     command = "echo 'IPv4 cidr blocks: ${jsonencode(local.ipv4_cidr_block)}'"
   }
+  provisioner "local-exec" {
+    command = "echo 'Resource group: ${var.resource_group_name}'"
+  }
+}
+
+data ibm_resource_group resource_group {
+  count = var.enabled ? 1 : 0
+  depends_on = [null_resource.print_names]
+
+  name = var.resource_group_name
 }
 
 data ibm_is_vpc vpc {
@@ -78,7 +86,7 @@ resource ibm_is_network_acl subnet_acl {
 
   name = local.name_prefix
   vpc  = local.vpc_id
-  resource_group = var.resource_group_id
+  resource_group = local.resource_group_id
 
   dynamic "rules" {
     for_each = local.acl_rules
@@ -133,7 +141,7 @@ resource ibm_is_subnet vpc_subnets {
   public_gateway           = local.gateway_count == 0 ? null : coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
   total_ipv4_address_count = local.total_ipv4_address_count
   ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
-  resource_group           = var.resource_group_id
+  resource_group           = local.resource_group_id
   network_acl              = var.provision ? ibm_is_network_acl.subnet_acl[0].id : null
 }
 
