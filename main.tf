@@ -127,7 +127,7 @@ resource ibm_is_network_acl subnet_acl {
 resource ibm_is_subnet vpc_subnets {
   count                    = var.provision && var.enabled ? var._count : 0
 
-  name                     = "${local.name_prefix}${format("%02s", count.index)}"
+  name                     = "${local.name_prefix}${format("%02s", count.index + 1)}"
   zone                     = local.vpc_zone_names[count.index]
   vpc                      = local.vpc_id
   public_gateway           = local.gateway_count == 0 ? null : coalesce([ for gateway in var.gateways: gateway.id if gateway.zone == local.vpc_zone_names[count.index] ]...)
@@ -140,5 +140,5 @@ resource ibm_is_subnet vpc_subnets {
 data ibm_is_subnet vpc_subnet {
   count = !var.provision && var.enabled ? var._count : 0
 
-  name  = "${local.name_prefix}${format("%02s", count.index)}"
+  name  = "${local.name_prefix}${format("%02s", count.index + 1)}"
 }
