@@ -20,7 +20,7 @@ output "subnets" {
 
 output "acl_id" {
   description = "The id of the network acl for the subnets"
-  value       = var.provision ? ibm_is_network_acl.subnet_acl[0].id : data.ibm_is_subnet.vpc_subnet[0].network_acl
+  value       = var.enabled ? (var.provision ? ibm_is_network_acl.subnet_acl[0].id : data.ibm_is_subnet.vpc_subnet[0].network_acl) : ""
 }
 
 output "vpc_name" {
@@ -31,5 +31,9 @@ output "vpc_name" {
 
 output "vpc_id" {
   description = "The id of the VPC where the subnets were provisioned"
-  value       = data.ibm_is_vpc.vpc.id
+  value       = local.vpc_id
+}
+
+output "enabled" {
+  value = var.enabled
 }

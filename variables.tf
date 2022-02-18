@@ -83,3 +83,9 @@ variable "acl_rules" {
   description = "List of rules to set on the subnet access control list"
   default = []
 }
+
+variable "enabled" {
+  type        = bool
+  description = "Flag to indicate that IBM VPC module should be enabled"
+  default     = true
+}

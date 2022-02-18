@@ -34,4 +34,5 @@ module "subnets" {
       source_port_max=22
     }
   }]
+  enabled             = var.enabled
 }
