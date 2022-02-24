@@ -34,11 +34,4 @@ module "subnets" {
       source_port_max=22
     }
   }]
-  enabled             = var.enabled
-}
-
-resource null_resource print_enabled {
-  provisioner "local-exec" {
-    command = "echo -n '${var.enabled}' > .enabled"
-  }
 }

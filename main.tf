@@ -4,7 +4,7 @@ locals {
   vpc_zone_names     = [ for index in range(var._count): "${var.region}-${((index + var.zone_offset) % local.zone_count) + 1}" ]
   gateway_count      = min(length(var.gateways), local.zone_count)
   name_prefix        = "${var.vpc_name}-subnet-${var.label}"
-  subnet_output      = var.enabled ? (var.provision ? ibm_is_subnet.vpc_subnets : data.ibm_is_subnet.vpc_subnet) : []
+  subnet_output      = var.provision ? ibm_is_subnet.vpc_subnets : data.ibm_is_subnet.vpc_subnet
   ipv4_cidr_provided = length(var.ipv4_cidr_blocks) >= var._count
   ipv4_cidr_block    = local.ipv4_cidr_provided ? var.ipv4_cidr_blocks : [ for val in range(var._count): null ]
   total_ipv4_address_count = local.ipv4_cidr_provided ? null : var.ipv4_address_count
@@ -46,13 +46,11 @@ locals {
     destination = "161.26.0.0/16"
   }]
   acl_rules = concat(local.default_acl_rules, var.acl_rules)
-  vpc_id = length(data.ibm_is_vpc.vpc) > 0 ? data.ibm_is_vpc.vpc[0].id : ""
-  resource_group_id = length(data.ibm_resource_group.resource_group) > 0 ? data.ibm_resource_group.resource_group[0].id : ""
+  vpc_id = data.ibm_is_vpc.vpc.id
+  resource_group_id = data.ibm_resource_group.resource_group.id
 }
 
 resource null_resource print_names {
-  count = var.enabled ? 1 : 0
-
   provisioner "local-exec" {
     command = "echo 'VPC name: ${var.vpc_name != null ? var.vpc_name : "null"}'"
   }
@@ -68,21 +66,19 @@ resource null_resource print_names {
 }
 
 data ibm_resource_group resource_group {
-  count = var.enabled ? 1 : 0
   depends_on = [null_resource.print_names]
 
   name = var.resource_group_name
 }
 
 data ibm_is_vpc vpc {
-  count = var.enabled ? 1 : 0
   depends_on = [null_resource.print_names]
 
   name = var.vpc_name
 }
 
 resource ibm_is_network_acl subnet_acl {
-  count = var.provision && var.enabled ? 1 : 0
+  count = var.provision ? 1 : 0
 
   name = local.name_prefix
   vpc  = local.vpc_id
@@ -133,7 +129,7 @@ resource ibm_is_network_acl subnet_acl {
 }
 
 resource ibm_is_subnet vpc_subnets {
-  count                    = var.provision && var.enabled ? var._count : 0
+  count                    = var.provision ? var._count : 0
 
   name                     = "${local.name_prefix}${format("%02s", count.index + 1)}"
   zone                     = local.vpc_zone_names[count.index]
@@ -146,7 +142,7 @@ resource ibm_is_subnet vpc_subnets {
 }
 
 data ibm_is_subnet vpc_subnet {
-  count = !var.provision && var.enabled ? var._count : 0
+  count = !var.provision ? var._count : 0
 
   name  = "${local.name_prefix}${format("%02s", count.index + 1)}"
 }
