@@ -1,4 +1,5 @@
 name: ibm-vpc-subnets
+registryId: cloud-native-toolkit/vpc-subnets/ibm
 type: terraform
 description: Module to provision a collection of subnets for an existing VPC
 interfaces:
