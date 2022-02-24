@@ -44,7 +44,7 @@ provider "ibm" {
 }
 
 module "dev_subnet" {
-  source = "github.com/cloud-native-toolkit/terraform-ibm-vpc-subnets.git?ref=v1.0.3"
+  source = "cloud-native-toolkit/vpc-subnets/ibm"
   
   resource_group_id   = module.resource_groups.id
   vpc_name            = module.vpc.name
