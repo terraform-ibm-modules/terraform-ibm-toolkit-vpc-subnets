@@ -139,6 +139,7 @@ resource ibm_is_subnet vpc_subnets {
   ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
   resource_group           = local.resource_group_id
   network_acl              = var.provision ? ibm_is_network_acl.subnet_acl[0].id : null
+  tags                     = var.tags
 }
 
 data ibm_is_subnet vpc_subnet {

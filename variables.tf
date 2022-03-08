@@ -83,3 +83,9 @@ variable "acl_rules" {
   description = "List of rules to set on the subnet access control list"
   default = []
 }
+
+variable "tags" {
+  type        = list(string)
+  default     = []
+  description = "Tags that should be added to the instance"
+}
