@@ -117,6 +117,133 @@ versions:
                })),
              }))
         description: List of rules to set on the subnet access control list
+        default: '[]'
+    version: v1.12.2
+    outputs:
+      - name: count
+        description: The number of subnets created
+      - name: ids
+        description: The ids of the created subnets
+      - name: names
+        description: The ids of the created subnets
+      - name: subnets
+        description: The subnets that were created
+      - name: acl_id
+        description: The id of the network acl for the subnets
+      - name: vpc_name
+        description: The name of the VPC where the subnets were provisioned
+      - name: vpc_id
+        description: The id of the VPC where the subnets were provisioned
+  - platforms: []
+    providers:
+      - name: ibm
+        source: ibm-cloud/ibm
+    dependencies:
+      - id: resource-group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
+            version: '>= 1.0.0'
+      - id: vpc
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-vpc
+            version: '>= 1.0.0'
+      - id: gateways
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways
+            version: '>= 0.0.0'
+        optional: true
+    variables:
+      - name: resource_group_name
+        type: string
+        description: >-
+          The name of the IBM Cloud resource group where the VPC has been
+          provisioned.
+        moduleRef:
+          id: resource-group
+          output: name
+      - name: region
+        type: string
+        description: The IBM Cloud region where the cluster will be/has been installed.
+        scope: global
+      - name: vpc_name
+        type: string
+        description: The name of the vpc instance
+        moduleRef:
+          id: vpc
+          output: name
+      - name: zone_offset
+        type: number
+        description: >-
+          The offset for the zone where the subnet should be created. The
+          default offset is 0 which means the first subnet should be created in
+          zone xxx-1
+        default: '0'
+      - name: _count
+        type: number
+        description: The number of subnets that should be provisioned
+        default: '3'
+        scope: module
+        important: true
+      - name: label
+        type: string
+        description: Label for the subnets created
+        default: default
+        scope: module
+      - name: gateways
+        type: list(object({id = string, zone = string}))
+        description: List of gateway ids and zones
+        default: '[]'
+        moduleRef:
+          id: gateways
+          output: gateways
+        optional: true
+      - name: ipv4_cidr_blocks
+        type: list(string)
+        description: >-
+          List of ipv4 cidr blocks for the subnets that will be created (e.g.
+          ['10.10.10.0/24']). If you are providing cidr blocks then a value must
+          be provided for each of the subnets. If you don't provide cidr blocks
+          for each of the subnets then values will be generated using the
+          {ipv4_address_count} value.
+        default: []
+      - name: ipv4_address_count
+        type: number
+        description: >-
+          The size of the ipv4 cidr block that should be allocated to the
+          subnet. If {ipv4_cidr_blocks} are provided then this value is ignored.
+        default: '256'
+      - name: provision
+        type: bool
+        description: >-
+          Flag indicating that the subnet should be provisioned. If 'false' then
+          the subnet will be looked up.
+        default: true
+      - name: acl_rules
+        type: |-
+          list(object({
+               name=string,
+               action=string,
+               direction=string,
+               source=string,
+               destination=string,
+               tcp=optional(object({
+                 port_min=number,
+                 port_max=number,
+                 source_port_min=number,
+                 source_port_max=number
+               })),
+               udp=optional(object({
+                 port_min=number,
+                 port_max=number,
+                 source_port_min=number,
+                 source_port_max=number
+               })),
+               icmp=optional(object({
+                 type=number,
+                 code=optional(number)
+               })),
+             }))
+        description: List of rules to set on the subnet access control list
         default: []
     version: v1.12.1
     outputs:
