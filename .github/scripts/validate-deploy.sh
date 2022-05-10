@@ -2,6 +2,10 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
+BIN_DIR=$(cat .bin_dir)
+
+export PATH="${BIN_DIR}:${PATH}"
+
 echo "terraform.tfvars"
 cat terraform.tfvars
 
@@ -12,11 +16,10 @@ RESOURCE_GROUP_NAME=$(cat terraform.tfvars | grep resource_group_name | sed "s/r
 echo "PREFIX_NAME: ${PREFIX_NAME}"
 echo "REGION: ${REGION}"
 echo "RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}"
-echo "IBMCLOUD_API_KEY: ${IBMCLOUD_API_KEY}"
 
 VPC_NAME="${PREFIX_NAME}-vpc"
 
-ibmcloud login -r "${REGION}" -g "${RESOURCE_GROUP_NAME}" --apikey "${IBMCLOUD_API_KEY}"
+ibmcloud login -r "${REGION}" -g "${RESOURCE_GROUP_NAME}"
 
 echo "Retrieving VPC_ID for name: ${VPC_NAME}"
 VPC_ID=$(ibmcloud is vpcs | grep "${VPC_NAME}" | sed -E "s/^([A-Za-z0-9-]+).*/\1/g")
