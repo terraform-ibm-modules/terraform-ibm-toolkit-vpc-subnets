@@ -88,6 +88,7 @@ resource ibm_is_network_acl subnet_acl {
     for_each = local.acl_rules
 
     content {
+      subnets     = var._count
       name        = "${local.name_prefix}-${rules.value["name"]}"
       action      = rules.value["action"]
       direction   = rules.value["direction"]
