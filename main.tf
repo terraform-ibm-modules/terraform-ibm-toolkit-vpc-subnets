@@ -83,47 +83,47 @@ resource ibm_is_network_acl subnet_acl {
   name = local.name_prefix
   vpc  = local.vpc_id
   resource_group = local.resource_group_id
+}
 
-  dynamic "rules" {
-    for_each = local.acl_rules
+resource ibm_is_network_acl_rule acl_rule {
+  count = var.provision ? length(local.acl_rules) : 0
+
+  network_acl = var.provision ? ibm_is_network_acl.subnet_acl[0].id : ""
+
+  name        = "${local.name_prefix}-${local.acl_rules[count.index]["name"]}"
+  action      = local.acl_rules[count.index]["action"]
+  direction   = local.acl_rules[count.index]["direction"]
+  source      = local.acl_rules[count.index]["source"]
+  destination = local.acl_rules[count.index]["destination"]
+
+  dynamic "tcp" {
+    for_each = lookup(local.acl_rules[count.index], "tcp", null) != null ? [ lookup(local.acl_rules[count.index], "tcp", null) ] : []
 
     content {
-      name        = "${local.name_prefix}-${rules.value["name"]}"
-      action      = rules.value["action"]
-      direction   = rules.value["direction"]
-      source      = rules.value["source"]
-      destination = rules.value["destination"]
+      port_min = tcp.value["port_min"]
+      port_max = tcp.value["port_max"]
+      source_port_min = tcp.value["source_port_min"]
+      source_port_max = tcp.value["source_port_max"]
+    }
+  }
 
-      dynamic "tcp" {
-        for_each = lookup(rules.value, "tcp", null) != null ? [ lookup(rules.value, "tcp", null) ] : []
+  dynamic "udp" {
+    for_each = lookup(local.acl_rules[count.index], "udp", null) != null ? [ lookup(local.acl_rules[count.index], "udp", null) ] : []
 
-        content {
-          port_min = tcp.value["port_min"]
-          port_max = tcp.value["port_max"]
-          source_port_min = tcp.value["source_port_min"]
-          source_port_max = tcp.value["source_port_max"]
-        }
-      }
+    content {
+      port_min = udp.value["port_min"]
+      port_max = udp.value["port_max"]
+      source_port_min = udp.value["source_port_min"]
+      source_port_max = udp.value["source_port_max"]
+    }
+  }
 
-      dynamic "udp" {
-        for_each = lookup(rules.value, "udp", null) != null ? [ lookup(rules.value, "udp", null) ] : []
+  dynamic "icmp" {
+    for_each = lookup(local.acl_rules[count.index], "icmp", null) != null ? [ lookup(local.acl_rules[count.index], "icmp", null) ] : []
 
-        content {
-          port_min = udp.value["port_min"]
-          port_max = udp.value["port_max"]
-          source_port_min = udp.value["source_port_min"]
-          source_port_max = udp.value["source_port_max"]
-        }
-      }
-
-      dynamic "icmp" {
-        for_each = lookup(rules.value, "icmp", null) != null ? [ lookup(rules.value, "icmp", null) ] : []
-
-        content {
-          type = icmp.value["type"]
-          code = lookup(icmp.value, "code", null)
-        }
-      }
+    content {
+      type = icmp.value["type"]
+      code = lookup(icmp.value, "code", null)
     }
   }
 }
