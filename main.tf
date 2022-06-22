@@ -90,7 +90,7 @@ resource ibm_is_network_acl_rule acl_rule {
 
   network_acl = var.provision ? ibm_is_network_acl.subnet_acl[0].id : ""
 
-  name        = "${local.name_prefix}-${local.acl_rules[count.index]["name"]}"
+  name        = substr("${local.name_prefix}-${local.acl_rules[count.index]["name"]}", 0, 63)
   action      = local.acl_rules[count.index]["action"]
   direction   = local.acl_rules[count.index]["direction"]
   source      = local.acl_rules[count.index]["source"]
