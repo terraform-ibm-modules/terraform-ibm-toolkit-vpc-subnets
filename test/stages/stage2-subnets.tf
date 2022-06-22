@@ -10,7 +10,7 @@ module "subnets" {
   ipv4_cidr_blocks   = jsondecode(var.ipv4_cidr_blocks)
   ipv4_address_count = var.ipv4_address_count
   acl_rules          = [{
-    name="ingress-ssh"
+    name="ingress-ssh---this-is-a-really-long-name-to-test-for-proper-string-trimming"
     action="allow"
     direction="inbound"
     source="0.0.0.0/0"
@@ -22,7 +22,7 @@ module "subnets" {
       source_port_max=22
     }
   }, {
-    name="egress-ssh"
+    name="egress-ssh---this-is-a-really-long-name-to-test-for-proper-string-trimming"
     action="allow"
     direction="outbound"
     destination="0.0.0.0/0"
