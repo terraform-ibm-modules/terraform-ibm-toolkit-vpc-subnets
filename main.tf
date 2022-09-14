@@ -48,6 +48,7 @@ locals {
   acl_rules = concat(local.default_acl_rules, var.acl_rules)
   vpc_id = data.ibm_is_vpc.vpc.id
   resource_group_id = data.ibm_resource_group.resource_group.id
+  tags              = distinct(concat(var.common_tags, var.tags))
 }
 
 resource null_resource print_names {
@@ -139,7 +140,7 @@ resource ibm_is_subnet vpc_subnets {
   ipv4_cidr_block          = local.ipv4_cidr_block[count.index]
   resource_group           = local.resource_group_id
   network_acl              = var.provision ? ibm_is_network_acl.subnet_acl[0].id : null
-  tags                     = var.tags
+  tags                     = local.tags
 }
 
 data ibm_is_subnet vpc_subnet {
