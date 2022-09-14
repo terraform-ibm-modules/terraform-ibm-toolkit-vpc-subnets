@@ -63,3 +63,7 @@ variable "address_prefixes" {
 variable "address_prefix_count" {
   default = 0
 }
+
+variable "common_tags" {
+  default = ["common1", "test"]
+}

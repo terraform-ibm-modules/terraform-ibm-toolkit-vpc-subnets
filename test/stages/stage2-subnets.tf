@@ -34,4 +34,6 @@ module "subnets" {
       source_port_max=22
     }
   }]
+  common_tags      = var.common_tags
+  tags             = ["test", "vpc_subnet"]
 }

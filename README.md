@@ -14,15 +14,14 @@ The module depends on the following software components:
 ### Terraform providers
 
 - IBM Cloud provider >= 1.22.0
-- Helm provider >= 1.1.1 (provided by Terraform)
 
 ## Module dependencies
 
 This module makes use of the output from other modules:
 
-- Resource Group - github.com/cloud-native-toolkit/terraform-ibm-container-platform.git
-- VPC - github.com/cloud-native-toolkit/terraform-ibm-vpc.git
-- Gateway - github.com/cloud-native-toolkit/terraform-ibm-vpc-gateways.git
+- Resource Group - github.com/terraform-ibm-modules/terraform-ibm-toolkit-resource-group
+- VPC - github.com/terraform-ibm-modules/terraform-ibm-toolkit-vpc
+- Gateway - github.com/terraform-ibm-modules/terraform-ibm-toolkit-vpc-gateways
 
 ## Example usage
 
