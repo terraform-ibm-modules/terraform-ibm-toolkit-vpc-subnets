@@ -4,4 +4,11 @@
 *.tfstate*
 .terraform
 
+.terraform.*
+
+bin2
+test_bin_dir
+.bin_dir
+clis-debug.log
+
 module
