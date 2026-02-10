@@ -1,5 +1,7 @@
 # IBM VPC Subnets
 
+:warning: This module is no longer maintained. Please use [terraform-ibm-landing-zone-vpc](https://github.com/terraform-ibm-modules/terraform-ibm-landing-zone-vpc) for configuring IBM Cloud Virtual Private Cloud (VPC) resources.
+
 Terraform module to provision subnets for an existing VPC. The number of subnets created depends on the value provided for `_count`. The created subnets will be named after the vpc with a suffix based on the value provided for `label`. Optionally, if values are provided for `gateways` then the subnets will be created with a public gateway.
 
 ## Software dependencies
